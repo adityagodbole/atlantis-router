@@ -18,7 +18,6 @@ import (
 	"log/syslog"
 )
 
-var servers string
 
 func main() {
 	// Logging to syslog is more performant, which matters.
@@ -30,6 +29,7 @@ func main() {
 		log.SetFlags(0)
 	}
 
+	var servers string
 	flag.StringVar(&servers, "zk", "localhost:2181", "zookeeper connection string")
-	router.New(servers).Run()
+	router.New(servers, 8080).Run()
 }
