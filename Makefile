@@ -9,26 +9,24 @@
 ## See the License for the specific language governing permissions and limitations under the License.
 
 PROJECT_ROOT := $(shell pwd)
-ifeq ($(shell pwd | xargs dirname | xargs basename),lib)
-	VENDOR_PATH := $(shell pwd | xargs dirname | xargs dirname)/vendor
-else
-	VENDOR_PATH := $(PROJECT_ROOT)/vendor
-endif
-
-GOPATH := $(PROJECT_ROOT):$(VENDOR_PATH)
+##ifeq ($(shell pwd | xargs dirname | xargs basename),lib)
+##	VENDOR_PATH := $(shell pwd | xargs dirname | xargs dirname)/vendor
+##else
+##	VENDOR_PATH := $(PROJECT_ROOT)/vendor
+##endif
+##
+GOPATH := $(PROJECT_ROOT)
 export GOPATH
 
+PKGS := launchpad.net/gozk
+PKGS += code.google.com/p/go.tools/cmd/cover
+PKGS += github.com/gorilla/mux
 all:
 	@echo "make fmt|install-deps|test|annotate|example|routertest|clean"
 
-install-deps:
-	@echo "Installing Dependencies..."
-	@rm -rf $(VENDOR_PATH)
-	@mkdir -p $(VENDOR_PATH) || exit 2
-	@GOPATH=$(VENDOR_PATH) go get launchpad.net/gozk
-	@GOPATH=$(VENDOR_PATH) go get code.google.com/p/go.tools/cmd/cover
-	@GOPATH=$(VENDOR_PATH) go get github.com/gorilla/mux
-	@echo "Done."
+pkgs:
+	@rm -rf pkg
+	for p in $(PKGS); do go get $$p; done 
 
 test:
 ifdef TEST_PACKAGE
@@ -47,8 +45,7 @@ annotate:
 ifdef TEST_PACKAGE
 	@echo "Annotating $$TEST_PACKAGE..."
 	@go test $$TEST_PACKAGE $$VERBOSE $$EXTRA_FLAGS -coverprofile=cover.out
-	@go tool cover -html=cover.out
-	@rm -f cover.out
+	@go tool cover -html=cover.out -o coverreport.html
 else
 	@echo "Specify package!"
 endif
